@@ -88,15 +88,33 @@ d2_xd = [0; 0; 0]; % desired load acceleration
 enable_trajectory_generation = true;
 
 %sinusoid z and linear x
+% all_times = linspace(time_current, t_max, t_max/time_step_pos);
+% freq = 3;
+% ampl = 0.2;
+% x_max = 5;
+% xd_generated_x = all_times * x_max / t_max;
+% xd_generated_y = zeros(1, t_max/time_step_pos);
+% xd_generated_z = ampl * sin( freq * all_times );
+% xd_generated = [xd_generated_x', xd_generated_y', xd_generated_z'];
+% vd_generated = zeros(t_max/time_step_pos,3);
+
+
+% 8-shape trajectory generation
 all_times = linspace(time_current, t_max, t_max/time_step_pos);
-freq = 3;
-ampl = 0.2;
-x_max = 5;
-xd_generated_x = all_times * x_max / t_max;
-xd_generated_y = zeros(1, t_max/time_step_pos);
-xd_generated_z = ampl * sin( freq * all_times );
+A = 2; % amplitude for x
+B = 1; % amplitude for y
+freq = 2 * pi / t_max; % frequency for trajectory
+
+% Parametric equations for 8-shape (infinity shape)
+xd_generated_x = A * sin(freq * all_times);
+xd_generated_y = B * sin(2 * freq * all_times);
+xd_generated_z = 0.5 * sin(freq * all_times); % sinusoidal z-component (optional)
+
 xd_generated = [xd_generated_x', xd_generated_y', xd_generated_z'];
-vd_generated = zeros(t_max/time_step_pos,3);
+vd_generated = [A * freq * cos(freq * all_times)', ...
+                2 * B * freq * cos(2 * freq * all_times)', ...
+                0.5 * freq * cos(freq * all_times)'];
+
 
 
 %% Plotting Initialization
